@@ -6,12 +6,13 @@
   <title>Chatbot</title>
   <style>
     body { font-family: Arial, sans-serif; }
-    #chatbot { position: fixed; bottom: 20px; right: 20px; width: 300px; height: 400px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    #chatbot { position: fixed; bottom: 80px; right: 20px; width: 300px; height: 400px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: none; background: white; }
     #chatbot-header { background: #00796b; color: white; padding: 10px; text-align: center; }
     #chatbot-messages { padding: 10px; height: calc(100% - 110px); overflow-y: auto; }
     #chatbot-input { padding: 10px; border-top: 1px solid #ccc; }
     #chatbot-input input { width: 80%; padding: 5px; }
     #chatbot-input button { padding: 5px 10px; }
+    #chatbot-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #00796b; border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; }
   </style>
 </head>
 <body>
@@ -24,14 +25,24 @@
     </div>
   </div>
 
+  <div id="chatbot-icon" onclick="toggleChatbot()">💬</div>
+
   <script>
     const OPENAI_API_KEY = 'sk-proj-UyAIcePRahYY7iHPyRblT3BlbkFJl5yLtnwUKHVAkkgqGK3t';
+
+    function toggleChatbot() {
+      const chatbot = document.getElementById('chatbot');
+      chatbot.style.display = chatbot.style.display === 'none' ? 'block' : 'none';
+    }
 
     function sendMessage() {
       const userInput = document.getElementById('user-input').value;
       if (!userInput) return;
       addMessage('User', userInput);
       document.getElementById('user-input').value = '';
+
+      // Add context about the website
+      const websiteContext = "This chatbot is embedded in a website that provides information about [Your Website's Topic].";
 
       fetch('https://api.openai.com/v1/completions', {
         method: 'POST',
@@ -41,7 +52,7 @@
         },
         body: JSON.stringify({
           model: 'text-davinci-003',
-          prompt: userInput,
+          prompt: websiteContext + "\n\nUser: " + userInput + "\nChatbot:",
           max_tokens: 150
         })
       })
